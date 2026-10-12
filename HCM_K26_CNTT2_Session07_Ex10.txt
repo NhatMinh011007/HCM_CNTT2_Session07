@@ -1,0 +1,33 @@
+Phần 1: Phân tích & Đề xuất đa giải pháp
+Input: Thư mục gốc /var/logs/ (hoặc đường dẫn tương đương trên Windows), từ khóa TIMEOUT.
+
+Output: Danh sách các dòng chứa từ khóa kèm tên file và số dòng (line number).
+
+Đề xuất 2 giải pháp:
+
+Giải pháp 1 (PowerShell - Get-ChildItem kết hợp Select-String): Cách tiếp cận chuẩn PowerShell, mạnh mẽ, dễ lọc dòng và xử lý file bị khóa thông qua thuộc tính chia sẻ file.
+
+Giải pháp 2 (CMD - findstr): Công cụ dòng lệnh truyền thống của Windows, tốc độ quét file thô rất nhanh nhưng hạn chế về xử lý file bị khóa và định dạng đầu ra.
+
+Phần 2: So sánh & Lựa chọn
+Giải pháp 1 (PowerShell): Tốc độ nhanh; xử lý file bị khóa tốt (qua try-catch); chạy cross-platform (PowerShell Core); độ phức tạp thấp; hỗ trợ sẵn số dòng.
+
+Giải pháp 2 (findstr CMD): Tốc độ rất nhanh; xử lý file bị khóa kém (dễ lỗi truy cập); không cross-platform; code cực ngắn; hỗ trợ hiển thị số dòng qua cờ /N.
+
+Giải pháp 3 (Python): Tốc độ trung bình; xử lý file bị khóa tốt; tính cross-platform tuyệt đối; độ phức tạp cao hơn; tự quản lý số dòng bằng enumerate.
+
+Phần 3: Triển khai
+Lựa chọn: Giải pháp 1 (PowerShell).
+
+Lý do: PowerShell là công cụ chính được yêu cầu, hỗ trợ tốt việc xử lý ngoại lệ khi file bị khóa (locked) mà không làm dừng tiến trình, đồng thời trả về kết quả dạng đối tượng dễ đọc kèm sẵn số dòng.
+
+Câu lệnh hoàn chỉnh (Xử lý file bị khóa bằng try-catch):
+
+PowerShell
+Get-ChildItem -Path "C:\var\logs" -Recurse -File | ForEach-Object {
+    try {
+        Get-Content -Path $_.FullName -ErrorAction Stop | Select-String -Pattern "TIMEOUT"
+    } catch {
+        Write-Warning "Bỏ qua file đang bị khóa hoặc lỗi đọc: $($_.FullName)"
+    }
+}
