@@ -1,0 +1,16 @@
+1. Sơ đồ luồng dữ liệu (Pipeline)
+Plaintext
+[Get-Content access.log] (Đọc file) 
+       │
+       ▼ (stdout)
+       │
+[Select-String "TIMEOUT"] (Lọc dữ liệu)
+       │
+       ▼ (stdin -> stdout)
+       │
+[Measure-Object -Line] (Đếm dòng) ──► Con số tổng cuối cùng
+2. Câu lệnh PowerShell hoàn chỉnh
+PowerShell
+ -Get-Content access.log | Select-String "TIMEOUT" | Measure-Object -Line
+-(Để lấy ra đúng một con số duy nhất như yêu cầu nghiệp vụ, dùng thêm thuộc tính .
+-Lines ở cuối: (Get-Content access.log | Select-String "TIMEOUT" | Measure-Object -Line).Lines)

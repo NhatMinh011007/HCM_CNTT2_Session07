@@ -1,0 +1,14 @@
+Phần 1: Phân tích
+Lý do không dùng Notepad: Notepad cố gắng tải toàn bộ dung lượng file (500MB) trực tiếp vào RAM một lúc, dẫn đến quá tải bộ nhớ và làm máy tính bị treo cứng (Not Responding).
+
+Lý do lệnh cat bị đơ: Trong PowerShell, cat là alias của lệnh Get-Content. Lệnh này đọc và in toàn bộ 500MB nội dung ra màn hình console cùng một thời điểm mà không sử dụng cơ chế luồng (Stream) hay phân trang, làm Terminal quá tải và đứng hình.
+
+Phần 2: Hoàn thiện lệnh
+Xem toàn bộ file theo từng trang màn hình:
+
+PowerShell
+Get-Content server_log_500MB.log | more
+Chỉ xem 10 dòng cuối cùng (tìm lỗi mới nhất):
+
+PowerShell
+Get-Content server_log_500MB.log -Tail 10

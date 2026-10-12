@@ -1,0 +1,14 @@
+Phần 1: Phân tích
+Sai lầm: An nhầm giữa tìm tên file và tìm nội dung file.
+
+Phân biệt:
+
+Get-ChildItem: Tìm tên file/thư mục.
+
+Select-String: Đọc và lọc nội dung bên trong file.
+
+Phần 2: Sửa lỗi
+Lệnh lọc chữ "ERROR" trong file access.log kèm số dòng:
+
+PowerShell
+Select-String -Path access.log -Pattern "ERROR"

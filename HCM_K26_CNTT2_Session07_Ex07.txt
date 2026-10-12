@@ -1,0 +1,24 @@
+Phần 1: Phân tích lỗi
+Nguyên nhân: Script dùng tham số -CaseSensitive kết hợp với pattern "critical" (chữ thường), trong khi dữ liệu trong file log là CRITICAL (chữ hoa). Do phân biệt chữ hoa/thường khắt khe, lệnh Select-String không tìm thấy dòng khớp nào, khiến file daily_critical.txt không ghi nhận được lỗi nào.
+
+Phần 2: Sửa lỗi và kiểm thử
+1. Script đã sửa đúng
+(Bỏ tham số -CaseSensitive hoặc sửa pattern thành "CRITICAL")
+
+PowerShell
+# Script: deploy_checker.ps1
+# Mục đích: Trích xuất lỗi CRITICAL từ server.log vào daily_critical.txt
+
+"=== Bat dau quet log: $(Get-Date) ===" | Out-File daily_critical.txt
+Select-String -Path server.log -Pattern "critical" | Out-File -Append daily_critical.txt
+"=== Hoan tat. So dong loi: ===" | Out-File -Append daily_critical.txt
+(Get-Content daily_critical.txt).Count | Out-File -Append daily_critical.txt
+2. Nội dung file daily_critical.txt mong đợi
+Plaintext
+=== Bat dau quet log: 09/18/2026 02:30:00 ===
+server.log:2:2026-09-18 02:30:11 CRITICAL Database connection pool exhausted
+server.log:3:2026-09-18 02:30:45 CRITICAL Retry limit exceeded for payment-service
+=== Hoan tat. So dong loi: ===
+4
+3. Xử lý khi file server.log không tồn tại
+Hành vi: Script sẽ báo lỗi màu đỏ (Terminating/Non-terminating error) tại dòng Select-String do không tìm thấy đường dẫn file, đồng thời Select-String không truyền được dữ liệu nào xuống các bước sau. File daily_critical.txt vẫn được tạo ra (vì bước đầu tiên dùng Out-File ghi đè) nhưng sẽ dừng ở trạng thái lỗi và thiếu dữ liệu log.

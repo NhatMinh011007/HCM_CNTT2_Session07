@@ -1,0 +1,17 @@
+Phần 1: Phân tích lỗi
+   Dòng lệnh gây lỗi: Cả 3 lệnh sử dụng Out-File weekly_errors.txt thiếu tham số -Append.
+   Nguyên nhân kỹ thuật: Mặc định Out-File hoạt động theo chế độ ghi đè (overwrite): nó sẽ xóa sạch toàn bộ nội dung cũ trong file để ghi nội dung mới vào.
+   Hậu quả trong file: Do dùng Out-File đơn thuần liên tiếp 3 lần, dòng 1 bị ghi đè bởi dòng 2, và dòng 2 lại tiếp tục bị ghi đè bởi dòng 3. Kết quả là sau mỗi lần chạy, file weekly_errors.txt chỉ còn sót lại duy nhất dòng cuối cùng: [<timestamp>] --- Ket thuc quet ---.
+  Phần 2: Sửa lỗi và so sánh
+       1. Script đã sửa đúng (dùng -Append)
+  PowerShell
+# Script: hourly_log.ps1
+# Chạy mỗi giờ, cộng dồn lỗi vào weekly_errors.txt
+
+"[$(Get-Date)] --- Bat dau quet ---" | Out-File weekly_errors.txt
+Select-String -Path app.log -Pattern "error" | Out-File weekly_errors.txt -Append
+"[$(Get-Date)] --- Ket thuc quet ---" | Out-File weekly_errors.txt -Append
+2. Phân biệt Out-File và Add-Content
+   Out-File (mặc định không có tham số): Hoạt động theo chế độ ghi đè hoàn toàn. Lệnh này sẽ tự động xóa sạch toàn bộ nội dung cũ có sẵn trong file và chỉ ghi lại dữ liệu mới nhất, khiến mọi thông tin lịch sử trước đó bị xóa mất.
+
+   Out-File -Append hoặc Add-Content: Thực hiện cơ chế ghi nối. Thay vì xóa dữ liệu cũ, hệ thống sẽ tự động thêm các dòng nội dung mới vào ngay phía cuối file, giúp tích lũy và bảo toàn trọn vẹn dữ liệu qua các lần chạy script.
