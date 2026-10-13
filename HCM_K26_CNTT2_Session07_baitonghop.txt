@@ -1,0 +1,87 @@
+Phần 1 – Đọc và định vị tệp tin
+Lệnh in toàn bộ nội dung file:
+
+PowerShell
+Get-Content logs\server.log
+Giải thích Notepad và PowerShell:
+
+Notepad: Nạp toàn bộ nội dung file vào RAM cùng lúc. Với file lớn (500 MB), lượng RAM tiêu thụ cực lớn dễ dẫn đến quá tải và treo máy.
+
+PowerShell (Get-Content): Đọc file theo dạng luồng (stream) từng dòng, tiết kiệm RAM nên chạy mượt mà ngay cả với file dung lượng lớn.
+
+Lệnh tìm tất cả file đuôi .log đệ quy:
+
+PowerShell
+Get-ChildItem -Recurse -Filter *.log
+
+Phần 2 – Lọc dữ liệu và Pipe
+Lệnh lọc dòng chứa ERROR:
+
+PowerShell
+Get-Content logs\server.log | Select-String "ERROR"
+
+
+Phần 2 – Lọc dữ liệu và Pipe
+Lệnh lọc các dòng chứa chữ ERROR là:
+Get-Content logs\server.log | Select-String "ERROR"
+
+Phân biệt bản chất giữa tìm vị trí file và tìm nội dung bên trong file:
+
+Để trả lời câu hỏi "File server.log đang nằm ở thư mục nào?", ta dùng lệnh định vị vị trí file:
+Get-ChildItem -Recurse -Filter server.log
+
+Để trả lời câu hỏi "Bên trong file này có dòng nào chứa lỗi 404 không?", ta dùng lệnh đọc và lọc nội dung bên trong file:
+Get-Content logs\server.log | Select-String "404"
+
+Lệnh kết hợp Pipe | để đọc server.log rồi lọc ra các dòng chứa 404 là:
+Get-Content logs\server.log | Select-String "404"
+
+Lệnh duy nhất để tìm đệ quy tất cả file .log trong devops-lab, sau đó lọc ra những dòng không chứa chữ INFO là:
+Get-ChildItem -Recurse -Filter *.log | Get-Content | Select-String "INFO" -NotMatch
+
+Phần 3 – Toán tử chuyển hướng > và >>
+Lệnh ghi đè kết quả vào báo cáo:
+
+PowerShell
+Get-Content logs\server.log | Select-String "404" > reports\daily_report.txt
+Xử lý lỗi phát sinh:
+
+Lệnh ghi nối thêm (không mất báo cáo cũ):
+
+PowerShell
+Get-Content logs\server.log | Select-String "404" >> reports\daily_report.txt
+Hậu quả dùng nhầm >: Toán tử > sẽ ghi đè hoàn toàn, làm mất toàn bộ nội dung báo cáo cũ đã lưu ở Câu 7.
+
+Phần 4 – Shell Script và lệnh echo
+Lệnh in thông báo và tạo tiêu đề:
+
+PowerShell
+Write-Output "Dang loc log..."
+Write-Output "=== LOG REPORT ===" > reports\daily_report.txt
+Nội dung file scripts\auto_report.ps1:
+
+PowerShell
+# Script tu dong doc log va tao bao cao 404 hang ngay
+Write-Output "Dang bat dau chay script..."
+Get-Content logs\server.log | Select-String "404" > reports\daily_report.txt
+Phần 5 – Viết, chạy và thẩm định Script AI
+Quy trình thực thi:
+
+(a) Lệnh chạy script:
+
+PowerShell
+.\scripts\auto_report.ps1
+(b) Lệnh kiểm tra kết quả:
+
+PowerShell
+Get-Content reports\daily_report.txt
+Thẩm định script AI cleanup.ps1:
+
+(a) Dòng nguy hiểm: Remove-Item -Recurse -Force C:\*.
+
+Hậu quả: Xóa sạch toàn bộ tệp tin và thư mục trên ổ C:\ bao gồm hệ điều hành Windows và dữ liệu cá nhân.
+
+(b) Sửa đường dẫn an toàn:
+
+PowerShell
+Remove-Item -Recurse -Force C:\Users\student\Desktop\devops-lab\temp\*
